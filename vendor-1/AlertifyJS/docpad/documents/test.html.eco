@@ -1,0 +1,40 @@
+---
+layout: 'default'
+hljs: 	'light'
+component:	'alert'
+---
+  <section class="dark">
+    <div class="content">
+      <div class="segment">
+        <h1><i class="fa fa-code"></i> Demo</h1>
+        <hr />
+<pre>
+<code class="lang-javascript">
+alertify.alert('<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>Test');
+</code>
+</pre>
+        <div class="RIGHT">
+          <a class="button example" href="javascript:void(0);">
+            <span> Run </span>
+          </a>
+        </div>
+      </div>
+
+
+      <div class="segment">
+        <h1><i class="fa fa-code"></i> Demo</h1>
+        <hr />
+<pre>
+<code class="lang-javascript">
+alertify.alert('Test');
+</code>
+</pre>
+        <div class="RIGHT">
+          <a class="button example" href="javascript:void(0);">
+            <span> Run </span>
+          </a>
+        </div>
+        <div><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/></div>
+      </div>
+    </div>
+  </section>

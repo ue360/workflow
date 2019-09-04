@@ -1,0 +1,62 @@
+---
+layout: 'default'
+hljs: 	'light'
+component:	'notifier'
+---
+<section class="blue">
+    <div class="content">
+        <div class="grid two">
+            <div class="column">
+                <h1> Notifier </h1>
+                Unobtrusive notification messages can be used to give feedback to users.
+            </div>
+            <div class="right column">
+                <%- @partial('ad') %>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="lic">
+    <div class="content">
+        Looking for a commercial license ?  Keep your source code proprietary and <a href="https://www.uplabs.com/posts/alertifyjs" target="_blank"> Buy a Commercial License Today!</a>
+    </div>
+</section>
+<section class="dark">
+    <div class="content">
+
+        <!--Defult usage-->
+        <div class="segment has-menu">
+            <h1 id="usage">
+                <a href="#usage"><i class="fa fa-book"></i></a>
+                Default usage
+            </h1>
+            <hr />
+            <p>You create notification message by invoking <code> alertify.notify(...)</code></p>
+
+<pre>
+<code class="lang-javascript">
+/*
+ * @message  {String or DOMElement} The notification message contents.
+ * @type     {String }              The Type of notification message (CSS class name 'ajs-{type}' to be added).
+ * @wait     {Number}               The time (in seconds) to wait before the notification is auto-dismissed.
+ * @callback {Function}             A callback function to be invoked when the notification is dismissed.
+ * 
+ * @return {Object} Notification object.
+ *
+ * alertify.notify(message, type, wait, callback)
+ *
+ */
+var notification = alertify.notify('sample', 'success', 5, function(){  console.log('dismissed'); });
+</code> 
+</pre>
+            <div class="RIGHT">
+                <a class="button example" href="javascript:void(0);">
+                    <span> Run </span>
+                </a>
+            </div>
+        </div>
+        <!--//Defult usage-->        
+        
+        <%- @partial('menu', true) %>
+    </div>
+</section>

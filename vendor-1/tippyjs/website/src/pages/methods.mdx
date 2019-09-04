@@ -1,0 +1,119 @@
+---
+title: Methods
+path: /methods/
+index: 6
+---
+
+### Instance methods
+
+Methods on instances allow you to control the tippy programmatically. See the
+[Tippy Instance](/tippy-instance/) page for details on accessing an instance.
+
+#### show
+
+Programmatically show the tippy at any time:
+
+```js
+instance.show() // Default
+instance.show(0) // 0ms transition duration
+```
+
+#### hide
+
+Programmatically hide the tippy at any time:
+
+```js
+instance.hide() // Default
+instance.hide(500) // 500ms transition duration
+```
+
+#### disable
+
+Temporarily prevent a tippy from showing or hiding:
+
+```js
+instance.disable()
+```
+
+#### enable
+
+Re-enable a tippy:
+
+```js
+instance.enable()
+```
+
+#### set
+
+You can update any option after the instance has been created. Pass an object of
+new options in:
+
+```js
+instance.set({
+  arrow: true,
+  animation: 'scale',
+})
+```
+
+#### setContent
+
+Updating the `content` option has its own method as a shortcut:
+
+```js
+instance.setContent('New content')
+```
+
+#### destroy
+
+To permanently destroy and clean up the instance, use this method:
+
+```js
+instance.destroy()
+```
+
+The `_tippy` property is deleted from the reference element upon destruction.
+
+If you're destroying a delegate instance (i.e., one you created with the
+`target` option), pass `true` as an argument to destroy all child instances that
+may have been created too.
+
+```js
+instance.destroy(true)
+```
+
+### Static methods
+
+Static methods belong to the `tippy` module function rather than a tippy
+instance.
+
+#### setDefaults
+
+Set the default options for each new instance:
+
+```js
+tippy.setDefaults({
+  // Options
+})
+
+// Access the current defaults
+tippy.defaults
+```
+
+#### hideAll
+
+Hide all visible tippys on the document:
+
+```js
+// Use each tippy's own duration
+tippy.hideAll()
+// Hide them all instantly
+tippy.hideAll({ duration: 0 })
+// Hide them all except a particular one
+tippy.hideAll({ exclude: tippyInstance })
+tippy.hideAll({ exclude: referenceElement })
+```
+
+#### group
+
+Used to improve UX for elements near each other when their tooltips have a
+`delay`. Learn about [`tippy.group()` here](/misc#groups).

@@ -1,0 +1,579 @@
+[
+    {
+        "type": "p",
+        "name": "modal",
+        "label": "{Boolean}",
+        "desc": "Sets the dialog display mode, When set to <code>true</code> a screen dimmer will be used and access to the page contents will be prevented.",
+        "defaultValue": "true",
+        "script": "alertify.{component}('Modal: false').set('modal', false);",
+        "toggle": { "value": false }
+    },
+
+    {
+        "type": "p",
+        "name": "basic",
+        "label": "{Boolean}",
+        "desc": "Sets the dialog basic view mode, which hides both header/footer reserving their space as not to affect other options such as resize, move, maximize...etc.",
+        "defaultValue": "false",
+        "script": "alertify.{component}('Basic: true').set('basic', true);",
+        "toggle": { "value": true }
+    },
+
+    {
+        "type": "p",
+        "name": "frameless",
+        "label": "{Boolean}",
+        "desc": "Sets the dialog frameless view mode, which hides both header/footer. But footer space is not reserved, the content author must be aware that dialog header/commands might overlap with contents.",
+        "defaultValue": "false",
+        "script": "alertify.{component}('Frameless: true').set('frameless', true);",
+        "toggle": { "value": true }
+    },
+
+    {
+        "type": "p",
+        "name": "movable",
+        "label": "{Boolean}",
+        "desc": "Gets or sets a value indicating whether the dialog is movable.",
+        "defaultValue": "true",
+        "script": "alertify.{component}('Movable: false').set('movable', false);",
+        "toggle": { "value": false }
+    },
+    
+    {
+        "type": "p",
+        "name": "moveBounded",
+        "label": "{Boolean}",
+        "desc": "Gets or sets a value indicating whether a movable dialog is allowed to go off-screen or not.",
+        "defaultValue": "false",
+        "script": "alertify.{component}('Try moving this off the screen').set({'movable':true, 'moveBounded': true});"        
+    },
+
+    {
+        "type": "p",
+        "name": "resizable",
+        "label": "{Boolean}",
+        "desc": "Gets or sets a value indicating whether the dialog is resizable.",
+        "defaultValue": "false",
+        "script": "alertify.{component}('Resizable: true').set('resizable', true);",
+        "toggle": { "value": true }
+    },
+
+    {
+        "type": "p",
+        "name": "closable",
+        "label": "{Boolean}",
+        "desc": "Gets or sets a value indicating whether the <b>Close</b> button is displayed in the header of the dialog. In modal dialogs, clicking the dimmer will also trigger a close command unless <code>closableByDimmer</code> was set to <code>false</code>.",
+        "defaultValue": "true",
+        "script": "alertify.{component}('Closable: false').set('closable', false);",
+        "toggle": { "value": false }
+    },
+
+    {
+        "type": "p",
+        "name": "closableByDimmer",
+        "label": "{Boolean}",
+        "desc": "Gets or sets a value indicating whether clicking the dimmer of a <B>Closable Modal</b> dialog should trigger a close command or not.",
+        "defaultValue": "true",
+        "script": "alertify.{component}('closableByDimmer: false').set({'closableByDimmer': false});",
+        "toggle": { "value": false }
+    },
+
+    {
+        "type": "p",
+        "name": "maximizable",
+        "label": "{Boolean}",
+        "desc": "Gets or sets a value indicating whether the <b>Maximize</b> button is displayed in the header of the dialog.",
+        "defaultValue": "true",
+        "script": "alertify.{component}('Maximizable: false').set('maximizable', false);",
+        "toggle": { "value": false }
+    },
+
+    {
+        "type": "p",
+        "name": "startMaximized",
+        "label": "{Boolean}",
+        "desc": "Gets or sets a value indicating whether the dialog should start in a maximized state or not.",
+        "defaultValue": "false",
+        "script": "alertify.{component}().set({'startMaximized':true, 'message':'Start Maximized: true'}).show();",
+        "toggle": { "value": true }
+    },
+
+    {
+        "type": "p",
+        "name": "pinnable",
+        "label": "{Boolean}",
+        "desc": "Gets or sets a value indicating whether the <b>Pin</b> button is displayed in the header of the dialog (modeless only).",
+        "defaultValue": "true",
+        "script": "alertify.{component}('Modeless: false, Pinnable: false. Try scrolling the page!').set({'pinnable': false, 'modal':true});",
+        "toggle": { "value": false }
+    },
+
+    {
+        "type": "p",
+        "name": "transition",
+        "label": "{String}",
+        "desc": "Gets or sets the transition effect to be used when showing/hiding the dialog",
+        "defaultValue": "alertify.defaults.transition:pulse",
+        "script": "alertify.dialog('{component}').set({transition:'pulse',message: 'Transition effect: pulse'}).show();",
+        "list": {
+            "value": "pulse",
+            "items": [ "slide", "zoom", "flipx", "flipy", "fade", "pulse" ]
+        }
+    },
+
+    {
+        "type": "e",
+        "name": "onshow",
+        "label": "{Function}",
+        "desc": "Gets or sets a function to invoke when the dialog is shown",
+        "defaultValue": "undefined",
+        "script": [
+            "alertify.{component}().set({onshow:function(){ alertify.message('{component} was shown.')}});",
+            "alertify.{component}('Demo');"
+        ]
+    },
+
+    {
+        "type": "e",
+        "name": "onclosing",
+        "label": "{Function}",
+        "desc": "Gets or sets a function to invoke before closing the dialog. A <code>false</code> invocation result will prevent the dialog from closing.",
+        "defaultValue": "undefined",
+        "script": "alertify.{component}('Demo').set({ onclosing:function(){ alertify.message('{component} is about to close.')}});",
+        "remark": "To prevent the dialog from closing, make your callback return <code>false</code>."
+    },
+    {
+        "type": "e",
+        "name": "onclose",
+        "label": "{Function}",
+        "desc": "Gets or sets a function to invoke when the dialog is closed",
+        "defaultValue": "undefined",
+        "script": "alertify.{component}('Demo').set({onshow:null, onclose:function(){ alertify.message('{component} was closed.')}});"
+    },
+
+    {
+        "type": "e",
+        "name": "onfocus",
+        "label": "{Function}",
+        "desc": "Gets or sets a function to invoke when the dialog is focused for the first time.",
+        "defaultValue": "undefined",
+        "script": "alertify.{component}('Demo').set({onfocus:function(){ alertify.message('{component} - onfocus callback.')}});"
+    },
+    
+    {
+        "type": "e",
+        "name": "onmove",
+        "label": "{Function}",
+        "desc": "Gets or sets a function to invoke when the dialog is about to move.",
+        "defaultValue": "undefined",
+        "script": ["alertify.{component}('The call back will be invoked when this dialog is about to move.')",
+                   "        .set({",
+                   "            onmove:function(){ ",
+                   "                alertify.message('{component} - onmove callback.')",
+                   "            },",
+                   "            movable:true",
+                   "        });"
+                ]
+    },
+
+    {
+        "type": "e",
+        "name": "onmoved",
+        "label": "{Function}",
+        "desc": "Gets or sets a function to invoke once the dialog has been moved.",
+        "defaultValue": "undefined",
+        "script": ["alertify.{component}('The call back will be invoked once this dialog is moved.')",
+                   "        .set({",
+                   "            onmoved:function(){ ",
+                   "                alertify.message('{component} - onmoved callback.')",
+                   "            },",
+                   "            movable:true",
+                   "        });"
+                ]
+    },
+
+    {
+        "type": "e",
+        "name": "onresize",
+        "label": "{Function}",
+        "desc": "Gets or sets a function to invoke when the dialog is about to resize.",
+        "defaultValue": "undefined",
+        "script": ["alertify.{component}('The call back will be invoked when this dialog is about to resize.')",
+                   "        .set({",
+                   "            onresize:function(){ ",
+                   "                alertify.message('{component} - onresize callback.')",
+                   "            },",
+                   "            resizable:true",
+                   "        });"
+                ]
+    },
+    {
+        "type": "e",
+        "name": "onresized",
+        "label": "{Function}",
+        "desc": "Gets or sets a function to invoke once the dialog has been resized.",
+        "defaultValue": "undefined",
+        "script": ["alertify.{component}('The call back will be invoked once this dialog is resized.')",
+                   "        .set({",
+                   "            onresized:function(){ ",
+                   "                alertify.message('{component} - onresized callback.')",
+                   "            },",
+                   "            resizable:true",
+                   "        });"
+                ]
+    },
+    {
+        "type": "e",
+        "name": "onmaximize",
+        "label": "{Function}",
+        "desc": "Gets or sets a function to invoke when the dialog is about to maximize.",
+        "defaultValue": "undefined",
+        "script": ["alertify.{component}('The call back will be invoked when this dialog is about to maximize.')",
+                   "        .set({",
+                   "            onmaximize:function(){ ",
+                   "                alertify.message('{component} - onmaximize callback.')",
+                   "            },",
+                   "            maximizable:true",
+                   "        });"
+                ]
+    },
+    {
+        "type": "e",
+        "name": "onmaximized",
+        "label": "{Function}",
+        "desc": "Gets or sets a function to invoke when the dialog has been maximized.",
+        "defaultValue": "undefined",
+        "script": ["alertify.{component}('The call back will be invoked once this dialog is fully maximized.')",
+                   "        .set({",
+                   "            onmaximized:function(){ ",
+                   "                alertify.message('{component} - onmaximized callback.')",
+                   "            },",
+                   "            maximizable:true",
+                   "        });"
+                ]
+    },
+    {
+        "type": "e",
+        "name": "onrestore",
+        "label": "{Function}",
+        "desc": "Gets or sets a function to invoke when a maximized dialog is about to restore.",
+        "defaultValue": "undefined",
+        "script": ["alertify.{component}('The call back will be invoked when this dialog is about to restore.')",
+                   "        .set({",
+                   "            onrestore:function(){ ",
+                   "                alertify.message('{component} - onrestore callback.')",
+                   "            },",
+                   "            maximizable:true",
+                   "        })",
+                   "        .maximize();"
+                ]
+    },
+    {
+        "type": "e",
+        "name": "onrestored",
+        "label": "{Function}",
+        "desc": "Gets or sets a function to invoke when a maximized dialog has been restored.",
+        "defaultValue": "undefined",
+        "script": ["alertify.{component}('The call back will be invoked once this dialog is fully restored.')",
+                   "        .set({",
+                   "            onrestored:function(){ ",
+                   "                alertify.message('{component} - onrestored callback.')",
+                   "            },",
+                   "            maximizable:true",
+                   "        })",
+                   "        .maximize();"
+                ]
+    },
+
+    {
+        "type": "p",
+        "name": "overflow",
+        "label": "{Boolean}",
+        "desc": "Gets or sets a value indicating whether the content overflow is managed by the dialog or not.",
+        "defaultValue": "true",
+        "script": "alertify.{component}().set('overflow',false);",
+        "exec": false
+    },
+
+
+    {
+        "type": "p",
+        "name": "padding",
+        "label": "{Boolean}",
+        "desc": "Gets or sets a value indicating whether the content padding is managed by the dialog or not.",
+        "defaultValue": "true",
+        "script": "alertify.{component}().set('padding',false);",
+        "exec": false
+    },
+
+    {
+        "type": "p",
+        "name": "autoReset",
+        "label": "{Boolean}",
+        "desc": "Gets or sets a value indicating whether the dialog should reset size/position on window resize.",
+        "defaultValue": "true",
+        "script": "alertify.{component}('autoReset: false').set('autoReset', false);",
+        "toggle": { "value": false }
+    },
+
+    {
+        "type": "m",
+        "name": "setHeader",
+        "label": "chainable",
+        "desc": "Sets the contents of the dialog header.",
+        "params": [
+            { "name": "content", "type": "String or DOM Element", "desc": "The header content." }
+        ],
+        "script": "alertify.{component}('Hello World!').setHeader('<em> HTML Header </em> ');"
+    },
+    
+    {
+        "type": "m",
+        "name": "setContent",
+        "label": "chainable",
+        "desc": "Sets the contents of the dialog.",
+        "params": [
+            { "name": "content", "type": "String or DOM Element", "desc": "The dialog content." }
+        ],
+        "script": "alertify.{component}().setContent('<h1> Hello World! </h1>').show();",
+        "remark": "<b>Important:</b> This method replaces the entire dialog contents. For example, if used with a prompt dialog, the input field will be lost."
+    },    
+    
+    {
+        "type": "m",
+        "name": "setting",
+        "label": "",
+        "desc": "Gets or Sets dialog settings/options ",
+        "params": [
+            { "name": "key", "type": "String or Object", "desc": "A string specifying a setting/option key or object holding key/value pairs." },
+            { "name": "value", "type": "Optional", "desc": "The value associated with the key (in case it was a string)." }
+        ],
+        "script": [
+            "// set a single setting/option",
+            "alertify.{component}().setting('modal', false).show();",
+            "// set multiple settings/options",
+            "alertify.{component}().setting({'modal':false, 'closable':false});",
+            "// get a setting/option value",
+            "var isMaximizable = alertify.{component}().get('maximizable');"
+        ],
+        "exec": false,
+        "remark": "A separate <code>.get()</code> and <code>.set()</code> aliases are also available."
+    },
+    
+    {
+        "type": "m",
+        "name": "set",
+        "label": "chainable",
+        "desc": "Sets dialog settings/options.",
+        "params": [
+            { "name": "key", "type": "String or Object", "desc": "A string specifying a setting/option key or object holding key/value pairs." },
+            { "name": "value", "type": "Optional", "desc": "The value associated with the key (in case it was a string)." }
+        ],
+        "script": [
+            "// set a single setting/option",
+            "alertify.{component}().set('modal', false).show();",
+            "// set multiple settings/options",
+            "alertify.{component}().set({'modal':false, 'closable':false});"
+        ],
+        "exec": false,
+        "remark": "This method is an alias for <code>.setting()</code> method set mode."
+    },
+    
+    {
+        "type": "m",
+        "name": "get",
+        "label": "",
+        "desc": "Gets the dialog setting/option value.",
+        "params": [
+            { "name": "key", "type": "String", "desc": "The setting/option key." }
+        ],
+        "return": "The setting/option value." ,
+        "exec": false,
+        "script": "var isModal = alertify.{component}().get('modal');",
+        "remark": "This method is an alias for <code>.setting()</code> method get mode."
+    },
+    
+    {
+        "type": "m",
+        "name": "maximize",
+        "label": "chainable",
+        "desc": "Maximizes the dialog.",
+        "params": [ ],
+        "script": "alertify.{component}('This is a maximized dialog').maximize();"
+    },
+
+    {
+        "type": "m",
+        "name": "restore",
+        "label": "chainable",
+        "desc": "Restores the maximized dialog.",
+        "params": [ ],
+        "script": [
+            "var div = document.createElement('div');",
+            "div.innerHTML = 'This will be resored in 3 seconds';",
+            "//show maximized dialog",
+            "var {component} = alertify.{component}(div).maximize();",
+            "//restore the dialog after 3 seconds",
+            "var i = 3;",
+            "var interval = setInterval(function(){",
+            "  if(--i == 0){",
+            "    clearInterval(interval);",
+            "    //restore the dialog",
+            "    {component}.restore().set('message','Dialog restored.');",
+            "  }else{",
+            "    div.innerHTML = 'This will be resored in ' + i + ' seconds.';",
+            "  }",
+            "}, 1000);"
+        ]
+    },
+
+    {
+        "type": "m",
+        "name": "pin",
+        "label": "chainable",
+        "desc": " Pins a modeless dialog to the screen, preventing it from moving with body scroll.",
+        "params": [ ],
+        "script": "alertify.{component}('This is a modeless dialog, pinned to the screen.').set('modal', false).pin();"
+    },
+
+    {
+        "type": "m",
+        "name": "unpin",
+        "label": "chainable",
+        "desc": " Un-pins a modeless dialog from the screen, allowing it to move with body scroll.",
+        "params": [ ],
+        "script": "alertify.{component}('This is a modeless dialog, not pinned to the screen.').set('modal', false).unpin();"
+    },
+    {
+        "type": "m",
+        "name": "isOpen",
+        "label": "{Boolean}",
+        "desc": "Gets a value that indicates whether the dialog is open.",
+        "params": [ ],
+        "script": "var isOpen = alertify.{component}().isOpen();",
+        "exec": false
+    },
+
+    {
+        "type": "m",
+        "name": "isModal",
+        "label": "{Boolean}",
+        "desc": "Gets a value that indicates whether the dialog is modal.",
+        "params": [ ],
+        "script": "var isModal = alertify.{component}().isModal();",
+        "exec": false
+    },
+
+    {
+        "type": "m",
+        "name": "isMaximized",
+        "label": "{Boolean}",
+        "desc": "Gets a value that indicates whether the dialog is maximized.",
+        "params": [ ],
+        "script": "var isMaximized = alertify.{component}().isMaximized();",
+        "exec": false
+    },
+
+    {
+        "type": "m",
+        "name": "isPinned",
+        "label": "{Boolean}",
+        "desc": "Gets a value that indicates whether the dialog is pinned.",
+        "params": [ ],
+        "script": "var isPinned = alertify.{component}().isPinned();",
+        "exec": false
+    },
+
+    {
+        "type": "m",
+        "name": "show",
+        "label": "chainable",
+        "desc": "Shows the dialog",
+        "params": [ 
+            {"name": "modal", "type": "Boolean", "desc": "Indicates whether to show this dialog as modal or not."},
+            {"name": "className", "type": "String", "desc": "Specifies a custom class name to add to the dialog."}
+        ],
+        "script": "alertify.{component}().set('message', '{component} dialog!').show();"
+    },
+
+    {
+        "type": "m",
+        "name": "showModal",
+        "label": "chainable",
+        "desc": "Updates the dialog display mode to <b>Modal</b> and shows the dialog.",
+        "params": [ 
+            {"name": "className", "type": "String", "desc": "Specifies a custom class name to add to the dialog."}
+        ],
+        "script": "alertify.{component}().set('message','This is a modal {component} dialog!').showModal();"
+    },
+
+    {
+        "type": "m",
+        "name": "close",
+        "label": "chainable",
+        "desc": "Closes the current dialog instance.",
+        "params": [ ],
+        "script": "alertify.{component}().close();",
+        "exec": false,
+        "remark": "Use <code>alertify.closeAll()</code> to close all open dialogs. <br/> Use <code>alertify.closeOthers()</code> to close all open dialogs except this one."
+    },
+
+    {
+        "type": "m",
+        "name": "closeOthers",
+        "label": "chainable",
+        "desc": "Closes all open dialogs except this one.",
+        "params": [ ],
+        "script": "alertify.{component}().closeOthers();",
+        "exec": false,
+        "remark": "Use <code>alertify.closeAll()</code> to close all open dialogs."
+    },
+
+    {
+        "type": "m",
+        "name": "moveTo",
+        "label": "chainable",
+        "desc": "Move the dialog to a specific <code>X</code>,<code>Y</code> coordinates.",
+        "params": [
+            { "name": "x", "type": "Number", "desc": "X coordinate in pixels." },
+            { "name": "y", "type": "Number", "desc": "Y coordinate in pixels." }
+        ],
+        "script": "alertify.{component}('Moved to 0,0').moveTo(0,0);",
+        "exec": true
+    },
+
+    {
+        "type": "m",
+        "name": "resizeTo",
+        "label": "chainable",
+        "desc": "Resize the dialog to a specific width/height (the dialog must be 'resizable').",
+        "params": [
+            { "name": "width", "type": "Number or String", "desc": "The new dialog width in pixels or precent (#.#%)." },
+            { "name": "height", "type": "Number or String", "desc": "The new dialog height in pixels or precent (#.#%)." }
+        ],
+        "script": "alertify.{component}('Resized to 100%,250px').set('resizable',true).resizeTo('100%',250);",
+        "exec": true,
+        "remark": "The dialog must be <b>resizable</b> and it can be resized to a <b>minimum width</b> equal to the initial display width and a <b>minimum height</b> equal to the sum of header and footer heights. <br/> You can also pass a percent of the document <code>clientWidth</code>/<code>clientHeight</code>."
+    },
+
+    {
+        "type": "m",
+        "name": "bringToFront",
+        "label": "chainable",
+        "desc": "Brings the dialog to front of other dialogs (Will do nothing if the dialog is behind an open modal).",
+        "params": [ ],
+        "script": "alertify.{component}().bringToFront();",
+        "exec": false
+    },
+    
+    {
+        "type": "m",
+        "name": "destroy",
+        "label": "",
+        "desc": "Destroys the dialog instance, this will close the dialog, delete the associted DOM and reset all settings to its initial state.",
+        "params": [ ],
+        "script": "alertify.{component}().destroy();",
+        "exec": false
+    }
+]
+
