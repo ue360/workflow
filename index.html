@@ -1,0 +1,343 @@
+<!doctype html>
+<!--[if lte IE 9]><html class="ie"><![endif]-->
+<html>
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+	<meta name="description" content="" />
+	<title>工作流系统</title>
+	<link rel="stylesheet" href="styles/css/vendor.css" />
+	<link rel="stylesheet" href="styles/css/app.css" />
+	<script src="build/vendor.js"></script>
+	<script src="build/app.js"></script>
+	<!-- <script src="js/json2.js"></script>
+	<script src="js/template.js"></script>
+	<script src="js/jquery.js"></script>
+	<script src="vendor/popper.js/packages/popper/dist/umd/popper.js"></script>
+	<script src="vendor/tippyjs/umd/index.all.js"></script>
+	<script src="vendor/AlertifyJS/build/alertify.js"></script>
+	<script src="js/global.js"></script> -->
+	<script>
+		var workflow = new Workflow()
+	</script>
+</head>
+<body>
+<div class="fc-wrap">
+	<div class="fc-header">
+		<div class="fc-nav-left">
+			<div class="fc-nav-back">
+				<i class="fa fa-angle-left"></i>
+			</div>
+			<div class="fc-nav-title">默认对公支付流程</div>
+		</div>
+		<div class="fc-nav-center">
+			<div class="fc-nav-item">流程设计</div>
+		</div>
+		<div class="fc-nav-right">
+			<button type="button" class="fc-button fc-button-save">保存</button>
+			<button type="button" class="fc-button fc-button-back">返回</button>
+		</div>
+	</div>
+	<div class="fc-primary">
+		<div class="fc-design">
+			<div class="fc-zoom" id="zoom">
+				<div class="fc-zoom-out"></div>
+				<span>100%</span>
+				<div class="fc-zoom-in"></div>
+			</div>
+			<div class="box-container">
+				<div class="box-scale" id="box-scale">
+					<!-- <div class="start-node">
+						<div class="start-node-circle">开始</div>
+						<div class="add-node-toolbar">
+							<div class="add-node-btn">
+								<button type="button" class="fc-btn"><i class="fa fa-plus"></i></button>
+							</div>
+						</div>
+					</div>
+					<div class="fc-tree-wrap">
+						<div class="fc-tree-panel">
+							<div class="fc-tree-actor">
+								<button type="button" class="fc-btn-close"></button>
+								<div class="fc-node-label">
+									<div class="fc-node-header">
+										<div class="fc-node-title">直接主管审批</div>
+										<div class="fc-node-toolbar">
+											<button type="button" class="fc-btn">审批</button>
+										</div>
+									</div>
+									<div class="fc-node-body">
+										<div class="fc-node-text">连续多级主管</div>
+									</div>
+								</div>
+							</div>
+							<div class="add-node-toolbar">
+								<div class="add-node-btn">
+									<button type="button" class="fc-btn"><i class="fa fa-plus"></i></button>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="fc-tree-wrap">
+						<div class="fc-tree-panel">
+							<div class="add-col-toolbar">
+								<button type="button" class="add-col-btn">添加条件</button>
+							</div>
+							<div class="fc-tree-row">
+								<div class="fc-tree-col">
+									<div class="fc-tree-wrap">
+										<div class="fc-tree-panel">
+											<div class="fc-tree-node">
+												<div class="fc-arrow to-left">&lt;</div>
+												<div class="fc-arrow to-right">&gt;</div>
+												<button type="button" class="fc-btn-close"></button>
+												<div class="fc-node-label">
+													<div class="fc-node-header">
+														<div class="fc-node-title">未命名条件</div>
+													</div>
+													<div class="fc-node-body">
+														
+													</div>
+												</div>
+											</div>
+											<div class="add-node-toolbar">
+												<div class="add-node-btn">
+													<button type="button" class="fc-btn"><i class="fa fa-plus"></i></button>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="fc-tree-wrap">
+										<div class="fc-tree-panel">
+											<div class="fc-tree-actor">
+												<button type="button" class="fc-btn-close"></button>
+												<div class="fc-node-label">
+													<div class="fc-node-header">
+														<div class="fc-node-title">直接主管审批</div>
+														<div class="fc-node-toolbar">
+															<button type="button" class="fc-btn">审批</button>
+														</div>
+													</div>
+													<div class="fc-node-body">
+														<div class="fc-node-text">连续多级主管</div>
+													</div>
+												</div>
+											</div>
+											<div class="add-node-toolbar">
+												<div class="add-node-btn">
+													<button type="button" class="fc-btn"><i class="fa fa-plus"></i></button>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="top-cover-line"></div>
+									<div class="bottom-cover-line"></div>
+								</div>
+								<div class="fc-tree-col">
+									<div class="fc-tree-wrap">
+										<div class="fc-tree-panel">
+											<div class="fc-tree-node">
+												<div class="fc-arrow to-left">&lt;</div>
+												<div class="fc-arrow to-right">&gt;</div>
+												<button type="button" class="fc-btn-close"></button>
+												<div class="fc-node-label">
+													<div class="fc-node-header">
+														<div class="fc-node-title">直接主管审批</div>
+														<div class="fc-node-toolbar">
+															<button type="button" class="fc-btn">审批</button>
+														</div>
+													</div>
+													<div class="fc-node-body">
+														<div class="fc-node-text">连续多级主管</div>
+													</div>
+												</div>
+											</div>
+											<div class="add-node-toolbar">
+												<div class="add-node-btn">
+													<button type="button" class="fc-btn"><i class="fa fa-plus"></i></button>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="top-cover-line"></div>
+									<div class="bottom-cover-line"></div>
+								</div>
+								<div class="fc-tree-col">
+									<div class="fc-tree-wrap">
+										<div class="fc-tree-panel">
+											<div class="fc-tree-node">
+												<div class="fc-arrow to-left">&lt;</div>
+												<div class="fc-arrow to-right">&gt;</div>
+												<button type="button" class="fc-btn-close"></button>
+												<div class="fc-node-label">
+													<div class="fc-node-header">
+														<div class="fc-node-title">直接主管审批</div>
+														<div class="fc-node-toolbar">
+															<button type="button" class="fc-btn">审批</button>
+														</div>
+													</div>
+													<div class="fc-node-body">
+														<div class="fc-node-text">连续多级主管</div>
+													</div>
+												</div>
+											</div>
+											<div class="add-node-toolbar">
+												<div class="add-node-btn">
+													<button type="button" class="fc-btn"><i class="fa fa-plus"></i></button>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="top-cover-line"></div>
+									<div class="bottom-cover-line"></div>
+								</div>
+							</div>
+							<div class="add-node-toolbar">
+								<div class="add-node-btn">
+									<button type="button" class="fc-btn"><i class="fa fa-plus"></i></button>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="end-node">
+						<div class="end-node-circle"></div>
+						<div class="end-node-text">流程结束</div>
+					</div> -->
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- <div class="fc-menu">
+	<div class="fc-menu-item">
+		<div class="item-icon color-orange"><i class="fa fa-user-o"></i></div>
+		<div class="item-text">审批人</div>
+	</div>
+	<div class="fc-menu-item">
+		<div class="item-icon"><i class="fa fa-send"></i></div>
+		<div class="item-text">抄送人</div>
+	</div>
+	<div class="fc-menu-item">
+		<div class="item-icon color-green"><i class="fa fa-sitemap"></i></div>
+		<div class="item-text">条件分支</div>
+	</div>
+</div> -->
+
+<!-- 添加菜单 -->
+<script id="tpl-menu" type="text/html">
+	<div class="fc-menu">
+		{{each menus as menu}}
+		<div class="fc-menu-item">
+			<div class="item-icon{{if menu.iconColor}} color-{{menu.iconColor}}{{/if}}"><i class="fa fa-{{menu.icon}}"></i></div>
+			<div class="item-text">{{menu.text}}</div>
+		</div>
+		{{/each}}
+	</div>
+</script>
+
+<!-- 主架构 -->
+<script id="tpl-root" type="text/html">
+	<div class="start-node">
+		<div class="start-node-circle">开始</div>
+		{{include 'tpl-node-add'}}
+	</div>
+	<div class="end-node">
+		<div class="end-node-circle"></div>
+		<div class="end-node-text">流程结束</div>
+	</div>
+</script>
+
+<!-- 容器：节点 -->
+<script id="tpl-container" type="text/html">
+	<div class="fc-tree-wrap">
+		<div class="fc-tree-panel">
+			{{include 'tpl-node-add'}}
+		</div>
+	</div>
+</script>
+
+<!-- 容器：分支布局 -->
+<script id="tpl-row" type="text/html">
+	<div class="fc-tree-row"></div>
+</script>
+
+<!-- 容器：分支列 -->
+<script id="tpl-col" type="text/html">
+	<div class="fc-tree-col">
+		<div class="top-cover-line"></div>
+		<div class="bottom-cover-line"></div>
+	</div>
+</script>
+
+<!-- 按钮：添加节点 -->
+<script id="tpl-node-add" type="text/html">
+	<div class="add-node-toolbar">
+		<div class="add-node-btn">
+			<button type="button" class="fc-btn"><i class="fa fa-plus"></i></button>
+		</div>
+	</div>
+</script>
+
+<!-- 按钮：添加分支 -->
+<script id="tpl-col-add" type="text/html">
+	<div class="add-col-toolbar">
+		<button type="button" class="add-col-btn">添加条件</button>
+	</div>
+</script>
+
+<!-- 按钮：移除节点/分支 -->
+<script id="tpl-remove" type="text/html">
+	<button type="button" class="fc-btn-close"></button>
+</script>
+
+<!-- 角色节点 -->
+<script id="tpl-actor" type="text/html">
+	<div class="fc-tree-actor">
+		{{include 'tpl-remove'}}
+		<div class="fc-node-label">
+			<div class="fc-node-header">
+				<div class="fc-node-title">{{title}}</div>
+				<div class="fc-node-toolbar">
+					<button type="button" class="fc-btn">审批</button>
+				</div>
+			</div>
+			<div class="fc-node-body">
+				<div class="fc-node-text">{{text}}</div>
+			</div>
+		</div>
+	</div>
+</script>
+
+<!-- 条件节点 -->
+<script id="tpl-node" type="text/html">
+	<div class="fc-tree-node">
+		<div class="fc-arrow to-left">&lt;</div>
+		<div class="fc-arrow to-right">&gt;</div>
+		{{include 'tpl-remove'}}
+		<div class="fc-node-label">
+			<div class="fc-node-header">
+				<div class="fc-node-title">{{title||'未命名条件'}}</div>
+			</div>
+			<div class="fc-node-body">
+				<div class="fc-node-text">{{text}}</div>
+			</div>
+		</div>
+	</div>
+</script>
+
+<script>
+	// $.ux.dialog({
+	// 	title: '弹窗组件',
+	// 	message: "这是传说中的测试"
+	// });
+	// $.ux.drawer({
+	// 	title: '弹窗组件',
+	// 	message: "抽屉效果演示"
+	// });
+	// $.ux.alert('这是一条警告')
+	// $.ux.confirm('确定要执行此操作吗？')
+	// $.ux.notify('操作成功！', 'success')
+</script>
+</body>
+</html>

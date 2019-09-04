@@ -1,0 +1,12 @@
+.overflow(@size: @padding) {
+	overflow:auto;
+	padding-bottom:0;
+	*padding-bottom:@size;
+	&:after {
+		content:'\20';
+		display:block;
+		*display:none;
+		height:0;
+		margin-top:@size;
+	}
+}

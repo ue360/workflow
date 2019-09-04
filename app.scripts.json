@@ -1,0 +1,22 @@
+{
+  "chunks": {
+    "vendor": [
+      "json2",
+      "artTemplate",
+      "jquery",
+      "popper",
+      "tippyjs",
+      "alertify"
+    ]
+  },
+  "paths": {
+    "json2": "js/json2.js",
+    "artTemplate": "js/template.js",
+    "dialog": "vendor/artDialog/dist/dialog-plus.js",
+    "popper": "vendor/popper.js/packages/popper/dist/umd/popper.min.js",
+    "tippyjs": "vendor/tippyjs/umd/index.all.min.js",
+    "jquery": "js/jquery.js",
+    "model": "vendor/rmodal.js/dist/rmodal.min.js",
+    "alertify": "vendor/AlertifyJS/build/alertify.min.js"
+  }
+}

@@ -1,0 +1,42 @@
+.fc-button {
+    display: inline-block;
+    position: relative;
+    text-align: center;
+    cursor: pointer;
+	line-height: 1.5;
+    min-width: 80px;
+    height: 32px;
+    padding: 0 15px;
+    font-size: 14px;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    white-space: nowrap;
+    outline: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -ms-touch-action: manipulation;
+    touch-action: manipulation;
+    -webkit-transition: all .3s cubic-bezier(.645,.045,.355,1);
+    transition: all .3s cubic-bezier(.645,.045,.355,1);
+    color: rgba(0,0,0,.65);
+    background-color: #ffffff;
+
+    &-save {
+		&:focus, &:hover {
+			box-shadow: 2px 2px 5px rgba(0, 0, 0, .2);
+		}
+    }
+
+    &-back {
+		color: #fff;
+		border-color: #fff;
+		background: transparent;
+    	&:focus, &:hover {
+			color: #fff;
+			border-color: #fff;
+			background: #59acfc;
+    	}
+    }
+}

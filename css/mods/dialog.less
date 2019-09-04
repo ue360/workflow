@@ -1,0 +1,328 @@
+.alertify {
+	.ajs-dimmer, .ajs-modal {
+		z-index: 200001;
+	}
+	.ajs-header {
+		margin: -20px;
+		margin-bottom: -12px;
+		padding: 15px 20px;
+	}
+	.ajs-dialog {
+		// margin: auto;
+		max-width: none;
+		padding: 20px 20px 0 20px;
+		border: 1px solid rgba(0, 0, 0, 0.2);
+	    border-radius: 5px;
+	    background-color: #FFFFFF;
+	    box-shadow: 0 3px 9px rgba(0, 0, 0, 0.1);
+	}
+	.ajs-commands {
+		margin-top: -5px;
+		margin-right: 10px;
+		button {
+			width: 16px;
+			height: 16px;
+			padding: 0;
+			text-align: center;
+			font-size: 18px;
+			line-height: 16px;
+			outline: none;
+			vertical-align: top;
+			&.ajs-close {
+				background: none;
+				&:before {
+					display: inline-block;
+					content: '×';
+				}
+			}
+		}
+	}
+	.ajs-footer {
+		margin-left: -20px;
+		margin-right: -20px;
+		.ajs-buttons .ajs-button {
+		    position: relative;
+		    display: inline-block;
+		    height: 32px;
+		    min-width: 0;
+		    min-height: 0;
+		    padding: 0 15px;
+		    font-size: 14px;
+		    border-radius: 4px;
+		    white-space: nowrap;
+		    text-align: center;
+			line-height: 1.499;
+		    border: 1px solid transparent;
+		    border-color: #d9d9d9;
+		    outline: none;
+		    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.015);
+		    transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+		    -webkit-user-select: none;
+		    -moz-user-select: none;
+		    -ms-user-select: none;
+		    user-select: none;
+		    -ms-touch-action: manipulation;
+		    touch-action: manipulation;
+		    color: rgba(0, 0, 0, 0.65);
+		    background-color: #fff;
+		    cursor: pointer;
+
+		    &:hover {
+		    	border-color: #1890ff;
+		    	color: #1890ff;
+		    }
+		    &.ajs-ok {
+		    	color: #fff;
+			    border-color: #1890ff;
+			    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.12);
+			    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.045);
+			    background-color: #1890ff;
+			    &:hover {
+	  				border-color: #40a9ff;
+			    	background-color: #40a9ff;
+			    }
+			    &:active {
+	  				border-color: #096dd9;
+			    	background-color: #096dd9;
+			    }
+		    }
+		}
+	}
+
+	&.ajs-warning, 
+    &.ajs-success,
+    &.ajs-error {
+		.ajs-header {
+    		padding-left: 42px;
+			&:before {
+				position: absolute;
+				top: 16px;
+				left: 16px;
+			    width: 18px;
+			    height: 18px;
+			    // font-size: 12px;
+			    border-radius: 50%;
+			    border: 1px solid transparent;
+			    line-height: 16px;
+			    text-align: center;
+			    outline: 0;
+			    box-sizing: border-box;
+			}
+		}
+		.ajs-body .ajs-content {
+			padding-left: 32px;
+			padding-right: 32px;
+		}
+    }
+    &.ajs-warning {
+    	.ajs-header:before {
+    		content: '?';
+			color: #faad14;
+    		border-color: #faad14;
+    	}
+    }
+    &.ajs-success {
+    	.ajs-header:before {
+    		content: '✔';
+    		color: #52c41a;
+    		border-color: #52c41a;
+    	}
+    }
+    &.ajs-error {
+    	.ajs-header:before {
+    		content: '×';
+    		color: #f5222d;
+    		border-color: #f5222d;
+    	}
+    }
+    .ajs-modal {
+		text-align: center;
+	}
+	.ajs-dialog {
+		display: inline-block;
+		min-width: 420px;
+		margin: 10% auto;
+		text-align: left;
+	}
+
+	&.ajs-centered {
+		.ajs-modal {
+			text-align: center;
+			&:before {
+    			content: '';
+				display: inline-block;
+			    width: 0;
+			    height: 100%;
+			    vertical-align: middle;
+			}
+		}
+		.ajs-dialog {
+			display: inline-block;
+			min-width: 360px;
+			margin: 0 auto;
+			text-align: left;
+			vertical-align: middle;
+		}
+	}
+
+	.ajs-body {
+		margin: 0 -20px;
+		.ajs-content {
+			padding: 20px;
+		}
+	}
+
+	&.ajs-maximized, 
+	&.ajs-resizable,
+	&.ajs-drawer {
+		.ajs-body .ajs-content {
+			top: 42px;
+			left: 0;
+			right: 0;
+			bottom: 50px;
+		}
+	}
+
+	&.ajs-maximized, 
+	&.ajs-resizable {
+		.ajs-commands {
+			margin-right: 10px;
+		}
+		.ajs-header {
+			padding: 20px;
+		}
+	}
+	
+	&.ajs-drawer {
+		.ajs-modal {
+			overflow: hidden;
+		}
+		.ajs-dialog {
+			max-width: none;
+			min-width: 320px;
+		}
+		&.ajs-hidden {
+			/* .ajs-dimmer,  */.ajs-modal {
+				visibility: visible;
+				opacity: 1;
+			}
+		}
+		.ajs-body .ajs-content {
+			position: absolute;
+			overflow: auto;
+		}
+		.ajs-footer {
+			position: absolute;
+		    left: 0;
+		    right: 0;
+		    bottom: 0;
+		    margin: 0;
+		}
+	}
+	&.ajs-drawer .ajs-dialog {
+		-webkit-transition-property:-webkit-transform;
+		transition-property:transform;
+		-webkit-transition-timing-function:ease-in;
+		transition-timing-function:ease-in;
+		-webkit-transition-duration:.3s;
+		transition-duration:.3s;
+		
+		position: absolute;
+		right: 0;
+		height: 100%;
+		margin: 0;
+		border: 0;
+		border-radius: 0;
+	}
+	&.ajs-drawer.ajs-in:not(.ajs-hidden) .ajs-dialog {
+	    -webkit-transform:translateX(0);
+		-ms-transform:translateX(0);
+		-o-transform:translateX(0);
+		transform:translateX(0);
+	}
+	&.ajs-drawer.ajs-hidden .ajs-dialog {
+		-webkit-transform:translateX(100%);
+		-ms-transform:translateX(100%);
+		-o-transform:translateX(100%);
+		transform:translateX(100%);
+	}
+	&.ajs-drawer.ajs-out.ajs-hidden .ajs-dialog {
+	    -webkit-transition-duration:.2s;
+		transition-duration:.2s;
+	}
+}
+.alertify-notifier {
+	z-index: 200002;
+	// .ajs-message {
+	//     border: solid 1px #ddd;
+	//     border-radius: 2px;
+	//     text-align: center;
+	//     color: #000;
+	// 	background: rgba(255, 255, 255, 0.95);
+	// }
+	// .ajs-message {
+	// 	color: #fff;
+	//     text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.5);
+	//     background: rgba(91, 189, 114, 0.95);
+	// }
+	.ajs-message {
+		position: relative;
+	    padding: 16px 24px !important;
+	    overflow: hidden;
+	    background: #fff !important;
+	    border-radius: 4px;
+	    -webkit-box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+	    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+
+	    &.ajs-warning, 
+	    &.ajs-success,
+	    &.ajs-error {
+	    	padding-left: 42px !important;
+			&:before {
+				position: absolute;
+				top: 18px;
+				left: 18px;
+			    width: 16px;
+			    height: 16px;
+			    border-radius: 50%;
+			    line-height: 16px;
+			    text-align: center;
+			    outline: 0;
+			    color: #fff;
+			}
+	    }
+	    &.ajs-warning {
+	    	&:before {
+	    		content: '!';
+	    		background-color: #faad14;
+	    	}
+	    }
+	    &.ajs-success {
+	    	&:before {
+	    		content: '√';
+	    		background-color: #52c41a;
+	    	}
+	    }
+	    &.ajs-error {
+	    	&:before {
+	    		content: '×';
+	    		background-color: #f5222d;
+	    	}
+	    }
+
+	    .ajs-close {
+	    	position: absolute;
+		    top: 16px;
+		    right: 12px;
+		    outline: none;
+		    text-align: center;
+		    line-height: 16px;
+		    color: rgba(0,0,0,0.45);
+		    background: none !important;
+
+		    &:before {
+		    	content: 'x';
+		    }
+	    }
+	}
+}
