@@ -7,6 +7,10 @@
       "popper",
       "tippyjs",
       "alertify"
+    ],
+    "vendor.tree": [
+      "tree-core",
+      "tree-check"
     ]
   },
   "paths": {
@@ -17,6 +21,9 @@
     "tippyjs": "vendor/tippyjs/umd/index.all.min.js",
     "jquery": "js/jquery.js",
     "model": "vendor/rmodal.js/dist/rmodal.min.js",
-    "alertify": "vendor/AlertifyJS/build/alertify.min.js"
+    "alertify": "vendor/AlertifyJS/build/alertify.min.js",
+
+    "tree-core": "vendor/zTree_v3/js/jquery.ztree.core.min.js",
+    "tree-check": "vendor/zTree_v3/js/jquery.ztree.excheck.min.js"
   }
 }

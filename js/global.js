@@ -41,21 +41,29 @@
 			options: {
 				maximizable: true,
 				resizable: false,
-				moveBounded: true,
+				moveBounded: true/*,
 				onclose: function() {
 					var me = this;
 					setTimeout(function() {
 						me.destroy()
 					}, 500)
-				}
+				}*/
 			}
 		};
 		var defaultConfig = {
 			main: function(cfg) {
 				this.set('title', cfg.title);
-				this.set('message', cfg.message);
+				this.set('html', cfg.html);
 				this.set('onok', cfg.onok);
 				this.set('oncancel', cfg.oncancel);
+				this.set('onshow', cfg.onshow);
+				this.set('onclose', function() {
+					cfg.onclose && cfg.onclose.apply(this, arguments)
+					var me = this;
+					setTimeout(function() {
+						me.destroy()
+					}, 500)
+				});
 				return this;
 			},
 			setup: function() {
@@ -63,26 +71,31 @@
 			},
 			build: function() {},
 			prepare: function() {},
-			setMessage: function(message) {
-				this.setContent(message);
+			setHtml: function(html) {
+				this.setContent(html);
 			},
 			settings: {
 				width: null,
-				message: null,
+				height: null,
+				html: null,
 				labels: null,
 				onok: null,
-				oncancel: null
+				oncancel: null,
+				onshow: null,
+				onclose: null
 			},
 			settingUpdated: function(key, oldValue, newValue) {
 				switch (key) {
-					case 'message':
-						this.setMessage(newValue);
+					case 'html':
+						this.setHtml(newValue);
 						break;
 					case 'center':
 						this.elements.root.className += ' ajs-centered'
 						break;
 					case 'width':
 						this.elements.dialog.style.width = typeof newValue === 'number' ? (newValue + 'px') : newValue
+					case 'height':
+						this.elements.content.style.height = typeof newValue === 'number' ? (newValue + 'px') : newValue
 						break;
 				}
 			},
@@ -510,15 +523,21 @@
 		prompt: _model('prompt', 'warning'),
 		dialog: alertify.model,
 		drawer: alertify.drawer,
-		notify: alertify.notify
+		notify: alertify.notify,
+		template: function(id, data) {
+			if (!document.getElementById(id)) {
+				throw '模版未定义：' + id;
+			}
+			return template(id, data || {})
+		}
 	})
 })(jQuery)
 
 ;(function($, window) {
 	function Workflow(options) {
-		var me = this
 		var defaults = {
 				menus: [],
+				// 默认参数别名（可自定义）
 				params: {
 					prevId: 'prevId',
 					nodeId: 'nodeId',
@@ -528,6 +547,7 @@
 					childNode: 'childNode',
 					conditionNodes: 'conditionNodes'
 				},
+				// 默认模版（id）
 				templates: {
 					root: 'tpl-root',
 					menu: 'tpl-menu',
@@ -540,6 +560,7 @@
 					actor: 'tpl-actor',
 					node: 'tpl-node'
 				},
+				// 默认选择器（dom操作）
 				classes: {
 					zoom: '#zoom',
 					zoomOut: '.fc-zoom-out',
@@ -556,6 +577,8 @@
 					row: '.fc-tree-row',
 					col: '.fc-tree-col',
 					header: '.fc-node-header',
+					name: '.fc-node-title',
+					text: '.fc-node-text',
 					colAdd: '.add-col-btn',
 					remove: '.fc-btn-close',
 					movePrev: '.to-left',
@@ -563,12 +586,21 @@
 				}
 			}
 		var config = $.extend(true, {}, defaults, options);
+
+		// json数据
 		var _data = config.data || {}
 		var root
 			zoomScore = 1,
 			params = config.params,
 			templates = config.templates, 
 			classes = config.classes;
+
+		var _errorClass = 'fc-node-error',
+			_idProfix = 'fc-node-',
+			_types = {
+				route: 'route',
+				condition: 'condition'
+			}
 		function _get(data, key) {
 			return data[params[key] || key]
 		}
@@ -579,16 +611,12 @@
 						_set(data, k, key[k])
 					}
 				}
-				return me;
 			}
 			data[params[key] || key] = value
-			return me;
 		}
 		function _remove(data, key) {
 			data[params[key] || key] = null
 			delete data[params[key] || key]
-
-			return me;
 		}
 		// function _clean(data) {
 		// 	for (var key in data) {
@@ -596,7 +624,6 @@
 		// 			_remove(data, key)
 		// 		}
 		// 	}
-		// 	return me;
 		// }
 		function _isNew() {
 			return Object.keys(_data).length === 0
@@ -615,7 +642,7 @@
 					prevId: prevId
 				})
 			}
-			el.addClass('fc-node-' + nodeId)
+			el.addClass(_idProfix + nodeId)
 			_maps[nodeId] = data
 			return nodeId;
 		}
@@ -624,7 +651,8 @@
 			return _maps[prevId]
 		}
 		function _getId(el) {
-			var m = el.get(0).className.match(/\sfc-node-([0-9a-zA-Z]{0,4})\s*/)
+			// var m = el.get(0).className.match(/\sfc-node-([0-9a-zA-Z]{0,4})\s*/)
+			var m = $(el).get(0).className.match(new RegExp("\\s" + _idProfix + "([0-9a-zA-Z]{0,4})\\s*"))
 			if (m) {
 				return m[1]
 			}
@@ -673,10 +701,7 @@
 			}
 		}
 		function getTemplate(id, data) {
-			if (!document.getElementById(id)) {
-				throw '模版未定义：' + id;
-			}
-			return template(id, data || {})
+			return $.ux.template.apply(this, arguments)
 		}
 		
 		/**
@@ -752,13 +777,16 @@
 			options = options || {}
 
 			var $panel = el.find(classes.panel)
-			var data = options.node
+			var data = options.node || {}
+			if (typeof data.text == 'function') {
+				data.text = data.text.apply(data.properties)
+			}
 			var $actor = $(getTemplate(templates.actor, data)).prependTo($panel)
 
 			if (isNew) {
 				_set(_data, {
 					type: options.type,
-					properties: {}
+					properties: data.properties || {}
 				})
 			}
 
@@ -813,13 +841,16 @@
 
 			options = options || {}
 			var $panel = el.find(classes.panel)
-			var data = options.node
+			var data = options.node || {}
+			if (typeof data.text == 'function') {
+				data.text = data.text.apply(data.properties)
+			}
 			var $node = $(getTemplate(templates.node, data)).prependTo($panel)
 			if (isNew) {
 				_set(_data, {
-					name: data ? data.title : '未命名条件',
+					name: data.name || '未命名条件',
 					type: options.type,
-					properties: {}
+					properties: data.properties || {}
 				})
 			}
 			var newNode = {
@@ -830,20 +861,6 @@
 			.on('click', classes.remove, function(e) {
 				e.stopPropagation()
 
-				/**
-				 * 1、node.parent = { // _parent
-				 * 	childNode: { // inner
-				 * 		conditionNodes: [{ // _datas
-				 * 			... // actorNode
-				 * 		}, {
-				 * 			...
-				 * 		}],
-				 * 		childNode: { // nextNode
-				 * 			...
-				 * 		}
-				 * 	}
-				 * }
-				 */
 				var _parent = _getParent(_getParent(_data))
 				var _inner = _get(_parent, 'childNode')
 				var _datas = _get(_inner, 'conditionNodes')
@@ -893,10 +910,10 @@
 
 					/**
 					 * 删除条件节点：当前要删除的（另一个保留的分支）
-					 * 1、含有流转角色
-					 * 	1)、条件节点含有下一流转节点（条件/角色）
+					 * 1、含有流转节点
+					 * 	1)、条件节点含有下一流转节点（条件/节点）
 					 * 	2)、没有下一流转节点
-					 * 2、没有流转角色
+					 * 2、没有流转节点
 					 * 	1)、条件节点含有下一流转节点
 					 * 	2)、没有下一流转节点
 					 */
@@ -973,7 +990,7 @@
 			
 			if (isNew) {
 				_set(_data, {
-					type: 'route',
+					type: _types.route,
 					properties: {},
 					conditionNodes: []
 				})
@@ -1047,7 +1064,7 @@
 						if (menu) {
 							var type = menu.type;
 							switch (type) {
-								case 'condition':
+								case _types.condition:
 									var _node = addLayout(node, menu, true)
 									addNode(addContainer(addCol(_node, true), true, 'prependTo'), menu, true)
 									addNode(addContainer(addCol(_node, true), true, 'prependTo'), menu, true)
@@ -1121,7 +1138,7 @@
 				var _datas
 				var $container
 				if (_datas = _get(_data, 'conditionNodes')) {
-					var options = getMenuOptions('condition')
+					var options = getMenuOptions(_types.condition)
 					var _node = addLayout(node, options)
 					$container = _node.container
 
@@ -1164,13 +1181,125 @@
 		init()
 		initEvents()
 		
+		// 排除掉 条件节点 的容器层
+		function _filterNot(data) {
+			return _get(data, 'type') !== _types.route
+		}
+
+		function _getValidRule(data) {
+			var type = _get(data, 'type')
+			var options = config.menus.filter(function(menu) {
+					return menu.type === type
+				})[0] || {}
+			return options.valid
+		}
+
+		// 默认验证规则
+		function _validRule(data) {
+			var props = _get(data, 'properties')
+			return !props || Object.keys(props).length === 0
+		}
+		
 		// 对外 api
 		return {
+			/**
+			 * 获取最终json（已做string转换）
+			 */
 			getJson: function() {
 				return JSON.stringify(_data)
 			},
-			set: _set,
+			/**
+			 * 设置对象扩展属性（支持链式操作）
+			 * 同时对节点默认属性（params中参数名）做替换处理
+			 * 
+			 * .set(data, key, value)
+			 * .set(data, {
+			 * 		key1: value1,
+			 * 		key2: value2,
+			 * 		...
+			 * })
+			 */
+			set: function() {
+				_set.apply(this, arguments)
+				return this;
+			},
+			/**
+			 * 获取对象属性值
+			 * 
+			 * .get(data, key)
+			 */
 			get: _get,
+			/**
+			 * 设置节点name属性（简化api）
+			 */
+			setName: function(node, value) {
+				var data = node.data
+				this.set(this.get(data, 'name'), value)
+				var el = node.el
+				el.find(classes.name).html(value)
+				return this;
+			},
+			/**
+			 * 替换回显文本
+			 */
+			setText: function(el, text) {
+				el.find(classes.text).html(text)
+				return this;
+			},
+			/**
+			 * 设置节点扩展属性（简化api）
+			 */
+			setProperties: function(data, properties) {
+				this.set(this.get(data, 'properties'), properties)
+				return this;
+			},
+			/**
+			 * 节点非空验证规则
+			 * 替换默认的全局验证规则
+			 */
+			rule: function(fn) {
+				_validRule = fn
+				return this;
+			},
+			/**
+			 * 一次性全局校验
+			 * fn[Function]：自定义校验规则
+			 * 如果节点类型（menus）配置里有valid[Function]选项，则为当前节点类型的自定义验证规则
+			 * 否则读取全局默认（或传入的自定义全局默认校验规则）
+			 */
+			validAll: function(fn) {
+				fn = fn || _validRule
+				var nodes = root.find(classes.container).filter(function() {
+					var el = this
+					var nodeId = _getId(el)
+					var data = _maps[nodeId]
+					var _fn = _getValidRule(data)
+					return _filterNot(data) && (_fn ? _fn.call(this, data) : fn.call(this, data))
+				})
+				if (nodes.length) {
+					nodes.addClass(_errorClass)
+					return false
+				}
+				return true
+			},
+			/**
+			 * 当前节点设置扩展属性后（警示或者销毁）验证提示
+			 */
+			valid: function(node, fn) {
+				var data = node.data, 
+					el = node.el.closest(classes.container)
+				var _fn = _getValidRule(data)
+				fn = fn || _fn || _validRule
+				if (fn.call(el, data)) {
+					el.addClass(_errorClass)
+				} else {
+					el.removeClass(_errorClass)
+				}
+				return this
+			},
+			/**
+			 * 外部导入配置（数据）
+			 */
 			load: function(data) {
 				_ready(function() {
 					var el = getStartNode()
@@ -1181,6 +1310,7 @@
 						data: _data
 					})
 				})
+				return this
 			}
 		}
 	}

@@ -271,6 +271,12 @@
 		    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, .3);
 	    	pointer-events: none;
 	    }
+
+	    &:hover:after {
+			border-color: #3296fa;
+			box-shadow: 0 0 6px 0 rgba(50,150,250,.3);
+	    }
+	    
 	    .fc-btn-close {
 	    	display: none;
 	    	position: absolute;
@@ -428,6 +434,17 @@
 			    background: linear-gradient(to right, #b99a01 0, #dcc943 100%);
 			}
     	}
+    }
+    .fc-node-error {
+    	> .fc-tree-panel {
+	    	> .fc-tree-node,
+	    	> .fc-tree-actor {
+		    	&:after {
+			    	border-color: #f25643;
+					box-shadow: 0 2px 5px 0 rgba(0,0,0,.1);
+				}
+			}
+		}
     }
 	.end-node {
 		border-radius: 50%;

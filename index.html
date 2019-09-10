@@ -13,6 +13,8 @@
 	<script src="js/json2.js"></script>
 	<script src="js/template.js"></script>
 	<script src="js/jquery.js"></script>
+	<script src="vendor/zTree_v3/js/jquery.ztree.core.js"></script>
+	<script src="vendor/zTree_v3/js/jquery.ztree.excheck.js"></script>
 	<script src="vendor/popper.js/packages/popper/dist/umd/popper.js"></script>
 	<script src="vendor/tippyjs/umd/index.all.js"></script>
 	<script src="vendor/AlertifyJS/build/alertify.js"></script>
@@ -31,8 +33,8 @@
 			<div class="fc-nav-item">流程设计</div>
 		</div>
 		<div class="fc-nav-right">
-			<button type="button" onclick="console.log(workflow.getJson())" class="fc-button fc-button-save">保存</button>
-			<button type="button" class="fc-button fc-button-back">返回</button>
+			<button type="button" id="btn-save" class="fc-button fc-button-save">保存</button>
+			<button type="button" id="btn-cancel" class="fc-button fc-button-back">返回</button>
 		</div>
 	</div>
 	<div class="fc-primary">
@@ -294,7 +296,7 @@
 		{{include 'tpl-remove'}}
 		<div class="fc-node-label">
 			<div class="fc-node-header">
-				<div class="fc-node-title">{{title}}</div>
+				<div class="fc-node-title">{{name}}</div>
 				{{if tips}}
 				<div class="fc-node-toolbar">
 					<button type="button" class="fc-btn">{{if icon}}<i class="fa fa-{{icon}}"></i>{{/if}}{{tips}}</button>
@@ -316,7 +318,7 @@
 		{{include 'tpl-remove'}}
 		<div class="fc-node-label">
 			<div class="fc-node-header">
-				<div class="fc-node-title">{{title||'未命名条件'}}</div>
+				<div class="fc-node-title">{{name||'未命名条件'}}</div>
 			</div>
 			<div class="fc-node-body">
 				<div class="fc-node-text">{{text}}</div>
@@ -325,29 +327,48 @@
 	</div>
 </script>
 
-<!-- 弹窗：审批 -->
+<!-- 弹窗演示：审批 -->
 <script id="tpl-approver" type="text/html">
 	<form name="form" novalidate="novalidate">
-		<div class="x-form">
+		<div class="fc-form">
 			<dl>
-				<dt><span class="star">*</span>条件名称</dt>
-				<dd><input type="text" name="" id="" /></dd>
+				<dt><span class="fc-star">*</span>条件名称</dt>
+				<dd><input type="text" name="" id="" class="fc-ipt" /></dd>
 			</dl>
 			<dl>
-				<dd><label class="x-group"><input type="radio" name="" />配置条件</label><label class="x-group"><input type="radio" name="" />不满足其他分支条件时，进入该分支</label></dd>
+				<dd><label class="fc-group"><input type="radio" name="" />配置条件</label><label class="fc-group"><input type="radio" name="" />不满足其他分支条件时，进入该分支</label></dd>
 			</dl>
 		</div>
+	</form>
+</script>
+
+<!-- 弹窗演示：条件 -->
+<script id="tpl-condition" type="text/html">
+	<form name="form" novalidate="novalidate">
+		<div class="fc-form">
+			<dl>
+				<dt><span class="fc-star">*</span>选择角色</dt>
+				<dd><input type="text" name="" class="fc-ipt fc-ipt-auto" /> <button type="button" class="fc-button tree-select">选 择</button></dd>
+			</dl>
+		</div>
+	</form>
+</script>
+
+<!-- 弹窗演示：选择树 -->
+<script id="tpl-tree" type="text/html">
+	<form name="form" novalidate="novalidate">
+		<div class="fc-tree"><ul class="ztree"></ul></div>
 	</form>
 </script>
 
 <script>
 	// $.ux.dialog({
 	// 	title: '弹窗组件',
-	// 	message: "这是传说中的测试"
+	// 	html: "这是传说中的测试"
 	// });
 	// $.ux.drawer({
 	// 	title: '弹窗组件',
-	// 	message: "抽屉效果演示"
+	// 	html: "抽屉效果演示"
 	// });
 	// $.ux.alert('这是一条警告')
 	// $.ux.confirm('确定要执行此操作吗？')
@@ -363,17 +384,32 @@
 				node: { // 可预定义配置
 					tips: '审批',
 					icon: 'edit',
-					title: '直接主管审批',
-					text: '请设置审批人'
+					name: '直接主管审批',
+					text: '请设置审批人', // 也支持function，this指向 properties
+					properties: {
+						
+					}
+				},
+				// 自定义非空验证规则
+				valid: function(data) {
+					// 返回 false 验证通过
+					return false
 				},
 				handler: function(node, event) {
 					var el = node.el;
 					var data = node.data;
 					$.ux.drawer({
 						title: '选择审批人',
-						message: template('tpl-approver', node.data),
+						html: $.ux.template('tpl-approver', node.data),
 						onok: function() {
-
+							// 节点配置 并 验证（提示）
+							// workflow.set(workflow.get(node.data, 'properties'), {
+							// 	test: '11'
+							// })
+							workflow.setProperties(node.data, {
+								test: '11'
+							})
+							workflow.valid(node)
 						}
 					}).set('width', 640)
 				}
@@ -386,12 +422,67 @@
 					tips: '支付',
 					icon: 'credit-card',
 					color: 'green', // 定义不同色块(blue/green/orange)，也支持色值(#b99a01)
-					title: '出纳支付'
+					name: '出纳支付'
 				}
 			}, {
 				type: 'condition',
 				icon: 'sitemap',
-				text: '条件分支'
+				text: '条件分支',
+				handler: function(node, event) {
+					var el = node.el;
+					var data = node.data;
+					$.ux.drawer({
+						title: '条件设置',
+						html: $.ux.template('tpl-condition', node.data),
+						onshow: function() {
+							var $content = $(this.elements.content)
+							$content.find('.tree-select').on('click', function() {
+								$.ux.dialog({
+									title: '选择角色',
+									html: $.ux.template('tpl-tree'),
+									onshow: function() {
+										var $$content = $(this.elements.content)
+										
+										var data = [{
+											id: 1,
+											pId: 0,
+											name: "半勾选 1",
+											halfCheck: true,
+											isParent: true
+										}, {
+											id: 2,
+											pId: 0,
+											name: "半勾选 2",
+											halfCheck: true,
+											checked: true,
+											isParent: true
+										}, {
+											id: 3,
+											pId: 0,
+											name: "随意勾选 3",
+											checked: true,
+											isParent: true
+										}]
+										$.fn.zTree.init($$content.find('.fc-tree .ztree'), {
+											check: {
+												enable: true,
+												autoCheckTrigger: true
+											},
+											data: {
+												simpleData: {
+													enable: true
+												}
+											}
+										}, data);
+									}
+								}).set('height', 420)
+							})
+						},
+						onok: function() {
+							
+						}
+					}).set('width', 640)
+				}
 			}],
 		// data: {
 		// 	"type": "start",
@@ -460,6 +551,14 @@
 			"type": "approver",
 			"properties": {}
 		}
+	})
+
+	$(document).ready(function() {
+		$('#btn-save').on('click', function() {
+			if (workflow.validAll()) {
+				console.log(workflow.getJson())
+			}
+		})
 	})
 </script>
 </body>
