@@ -85,7 +85,15 @@
 						this.elements.dialog.style.width = typeof newValue === 'number' ? (newValue + 'px') : newValue
 						break;
 				}
-			}
+			},
+            callback: function (closeEvent) {
+                if (typeof this.get('onok') === 'function') {
+                    var returnValue = this.get('onok').call(this, closeEvent);
+                    if (typeof returnValue !== 'undefined') {
+                        closeEvent.cancel = !returnValue;
+                    }
+                }
+            }
 		};
 		alertify.dialog('model', function() {
 			return $.extend(true, {}, defaultConfig, {
@@ -414,29 +422,29 @@
 	$.ux = $.ux || {}
 
 	var uid = ['0', '0', '0', '0'];
-	var uidPrefix = 'fc-uuid-';
 
-	function uuid() {
+	function uuid(prefix) {
 		var index = uid.length;
 		var digit;
+		prefix = prefix || ''
 
 		while (index) {
 			index--;
 			digit = uid[index].charCodeAt(0);
 			if (digit === 57 /*'9'*/ ) {
 				uid[index] = 'A';
-				return uidPrefix + uid.join('');
+				return prefix + uid.join('');
 			}
 			if (digit === 90 /*'Z'*/ ) {
 				uid[index] = '0';
 			} else {
 				uid[index] = String.fromCharCode(digit + 1);
-				return uidPrefix + uid.join('');
+				return prefix + uid.join('');
 			}
 		}
 		uid.unshift('0');
 
-		return uidPrefix + uid.join('');
+		return prefix + uid.join('');
 	}
 
 	function _model(type, icon) {
@@ -480,6 +488,7 @@
 	}
 
 	$.extend($.ux, {
+		id: uuid,
 		tips: function(el, options) {
 			if (arguments.length === 1) {
 				options = el
@@ -506,36 +515,19 @@
 })(jQuery)
 
 ;(function($, window) {
-	var menus = [{
-			type: 'actor', // 节点类型：actor-角色节点、node-条件节点
-			icon: 'user-o', // 图标，参考 fontasome
-			text: '审批人',
-			iconColor: 'orange', // 图标颜色定制，默认蓝色
-			data: { // 可预定义初始化时占位文本
-				title: '直接主管审批',
-				text: '连续多级主管'
-			},
-			handler: function() {
-				$.ux.drawer({
-					title: '选择审批人',
-					message: '请选择审批人'
-				})
-			}
-		}, {
-			type: 'actor',
-			icon: 'send',
-			color: 'green', // 定义不同色块(blue/green/orange)，也支持色值(#b99a01)
-			text: '抄送人'
-		}, {
-			type: 'node',
-			icon: 'sitemap',
-			text: '条件分支',
-			iconColor: 'green'
-		}]
 	function Workflow(options) {
-		var data = {}
+		var me = this
 		var defaults = {
-				menus: menus,
+				menus: [],
+				params: {
+					prevId: 'prevId',
+					nodeId: 'nodeId',
+					type: 'type',
+					name: 'name',
+					properties: 'properties',
+					childNode: 'childNode',
+					conditionNodes: 'conditionNodes'
+				},
 				templates: {
 					root: 'tpl-root',
 					menu: 'tpl-menu',
@@ -556,6 +548,8 @@
 					root: '#box-scale',
 					menu: '.fc-menu-item',
 					startNode: '.start-node',
+					// actor: '.fc-tree-actor',
+					// node: '.fc-tree-node',
 					nodeAdd: '.add-node-btn .fc-btn',
 					container: '.fc-tree-wrap',
 					panel: '.fc-tree-panel',
@@ -568,12 +562,77 @@
 					moveNext: '.to-right'
 				}
 			}
-		$.extend(defaults, options);
+		var config = $.extend(true, {}, defaults, options);
+		var _data = config.data || {}
 		var root
 			zoomScore = 1,
-			templates = defaults.templates, 
-			classes = defaults.classes;
+			params = config.params,
+			templates = config.templates, 
+			classes = config.classes;
+		function _get(data, key) {
+			return data[params[key] || key]
+		}
+		function _set(data, key, value) {
+			if (arguments.length === 2) {
+				for (var k in key) {
+					if (key.hasOwnProperty(k)) {
+						_set(data, k, key[k])
+					}
+				}
+				return me;
+			}
+			data[params[key] || key] = value
+			return me;
+		}
+		function _remove(data, key) {
+			data[params[key] || key] = null
+			delete data[params[key] || key]
 
+			return me;
+		}
+		// function _clean(data) {
+		// 	for (var key in data) {
+		// 		if (data.hasOwnProperty(key)) {
+		// 			_remove(data, key)
+		// 		}
+		// 	}
+		// 	return me;
+		// }
+		function _isNew() {
+			return Object.keys(_data).length === 0
+		}
+		var _maps = {}
+		function _apply(el, data, prevId) {
+			var nodeId = _get(data, 'nodeId')
+			if (!nodeId) {
+				nodeId = $.ux.id();
+				_set(data, {
+					nodeId: nodeId
+				})
+			}
+			if (prevId) {
+				_set(data, {
+					prevId: prevId
+				})
+			}
+			el.addClass('fc-node-' + nodeId)
+			_maps[nodeId] = data
+			return nodeId;
+		}
+		function _getParent(data) {
+			var prevId = _get(data, 'prevId');
+			return _maps[prevId]
+		}
+		function _getId(el) {
+			var m = el.get(0).className.match(/\sfc-node-([0-9a-zA-Z]{0,4})\s*/)
+			if (m) {
+				return m[1]
+			}
+		}
+		function swap(array, x, y) {
+			array[x] = array.splice(y, 1, array[x])[0];
+			return array;
+		}
 		function initEvents() {
 			if ($.isReady) {
 				var $zoom = $(classes.zoom)
@@ -621,24 +680,94 @@
 		}
 		
 		/**
-		 * 容器
-		 * @param {jq} el
+		 * 添加节点块
+		 * @param {object} node 
+		 * node: {
+		 * 	el: el,
+		 * 	data: data // 节点数据
+		 * }
 		 * @param {string} mode 插入方式，默认 插入el下方 appendTo/prependTo/insertAfter/...
 		 */
-		function addContainer(el, mode) {
+		function addContainer(node, isNew, mode) {
+			var el = node.el;
+			var _data = node.data;
 			mode = mode || 'insertAfter'
 			var $container = $(getTemplate(templates.container))[mode](el)
-			bindMenuEvents($container)
+			
+			var type = _get(_data, '$$type'), newNode
+			// 条件分支（增加列）时，data不需用增加childNode
+			if (type === 'condition') {
+				_remove(_data, '$$type')
+				newNode = {
+					el: $container,
+					data: _data
+				}
+			} else {
+				if (isNew) {
+					// tree结构，最上面的嵌套在外层，下面的节点是childNode
+					var _node = _get(_data, 'childNode')
+					if (_node) {
+						_set(_data, {
+							childNode: {
+								childNode: _node
+							}
+						})
+					} else {
+						_set(_data, {
+							childNode: {}
+						})
+					}
+				}
+				var data = _get(_data, 'childNode')
+				newNode = {
+					el: $container,
+					data: data
+				}
+			}
+			var prevNode, prevId
+			if (((prevNode = newNode.el.prev()) && prevNode.is(classes.container)) || ((prevNode = newNode.el.parent().closest(classes.container)) && prevNode.length) || (prevNode = getStartNode())) {
+				prevId = _getId(prevNode)
+			}
+			// 绑定 节点唯一标识及父级标识
+			var id = _apply(newNode.el, newNode.data, prevId)
 
-			return $container
+			// 如果有 nextNode 需要更新它的 prevId 指向为当前节点的 nodeId
+			var nextNode
+			if ((nextNode = newNode.el.next()) && nextNode.is(classes.container)) {
+				var nodeId = _getId(nextNode)
+				_set(_maps[nodeId], 'prevId', id)
+			}
+
+			bindMenuEvents(newNode)
+
+			return newNode
 		}
-		function addActor(el, options) {
+
+		/**
+		 * 添加节点（行为）
+		 */
+		function addActor(node, options, isNew) {
+			var el = node.el;
+			var _data = node.data;
 			options = options || {}
+
 			var $panel = el.find(classes.panel)
-			var data = options.data
+			var data = options.node
 			var $actor = $(getTemplate(templates.actor, data)).prependTo($panel)
-			var color = options.color
-			if (color) {
+
+			if (isNew) {
+				_set(_data, {
+					type: options.type,
+					properties: {}
+				})
+			}
+
+			var newNode = {
+				el: $actor,
+				data: _data
+			}
+			var color
+			if (data && (color = data.color)) {
 				if (color.charAt(0) === '#') {
 					$actor.find(classes.header).css('background', color)
 				} else {
@@ -649,95 +778,286 @@
 			.on('click', classes.remove, function(e) {
 				e.stopPropagation()
 				el.remove()
+				
+				/**
+				 * 1、自上而下删除是摘除当前节点的父级对象中的 childNode 替换为当前 子级的 childNode
+				 * 2、自下而上删除是直接摘除当前节点父级对象中的 childNode
+				 * 重点在于：对当前父级对象的获取
+				 */
+				var _parent = _getParent(_data)
+
+				// 判断当前节点是否含有childNode(即流转的下一节点)
+				var _node = _get(_data, 'childNode')
+				if (_node) {
+					// 把子集childNode提升替换为当前节点childNode
+					_remove(_maps, _get(_node, 'prevId'))
+					_set(_node, 'prevId', _get(_parent, 'nodeId'))
+					_set(_parent, 'childNode', _node)
+				} else {
+					_remove(_parent, 'childNode')
+				}
 			})
 			.on('click', function(e) {
 				if (options.handler) {
-					options.handler.call(options, $actor, e)
+					options.handler.call(options, newNode, e)
 				}
 			})
-			return $actor
+			return newNode
 		}
-		function addNode(el, options) {
+		/**
+		 * 添加节点（条件）
+		 */
+		function addNode(node, options, isNew) {
+			var el = node.el;
+			var _data = node.data;
+
 			options = options || {}
 			var $panel = el.find(classes.panel)
-			var data = options.data
+			var data = options.node
 			var $node = $(getTemplate(templates.node, data)).prependTo($panel)
+			if (isNew) {
+				_set(_data, {
+					name: data ? data.title : '未命名条件',
+					type: options.type,
+					properties: {}
+				})
+			}
+			var newNode = {
+				el: $node,
+				data: _data
+			}
 			$node
 			.on('click', classes.remove, function(e) {
 				e.stopPropagation()
+
+				/**
+				 * 1、node.parent = { // _parent
+				 * 	childNode: { // inner
+				 * 		conditionNodes: [{ // _datas
+				 * 			... // actorNode
+				 * 		}, {
+				 * 			...
+				 * 		}],
+				 * 		childNode: { // nextNode
+				 * 			...
+				 * 		}
+				 * 	}
+				 * }
+				 */
+				var _parent = _getParent(_getParent(_data))
+				var _inner = _get(_parent, 'childNode')
+				var _datas = _get(_inner, 'conditionNodes')
+				var _count = _datas.length
+				var index = _datas.indexOf(_data)
+
 				var $col = el.closest(classes.col)
 				// 判断当前是否只有两个条件
-				if ($col.parent().find(classes.col).length <= 2) {
-					$col.closest(classes.container).remove()
+				// var count = $col.parent().find(classes.col).length
+				if (_count <= 2) {
+					// var index = $col.index()
+					var _index = _count - index - 1;
+					var $container = $col.closest(classes.container)
+					if (_index !== index) {
+						var _$col = _index > index ? $col.next() : $col.prev()
+						
+						// 筛选 子节点 （排除第一个条件节点及嵌套节点）
+						var $nodes = _$col.find(classes.container).not(function(index) {
+							return index === 0 || $.contains(_$col.get(0), $(this).parent().closest(classes.container).get(0))
+						})
+						.each(function() {
+							$(this).insertBefore($container)
+						})
+					}
+					$container.remove()
 				} else {
 					$col.remove()
+				}
+
+				if (index > -1) {
+					_datas.splice(index, 1)
+				}
+
+				// 获取嵌套对象里最子集对象
+				var getTreeNode = function(data) {
+					var _data
+					if (_get(data, 'childNode')) {
+						return getTreeNode(_data)
+					}
+					return data
+				}
+
+				if (_count <= 2) {
+					var data = _datas[0], 
+						nextNode = _get(_inner, 'childNode'),
+						actorNode = _get(data, 'childNode')
+
+					/**
+					 * 删除条件节点：当前要删除的（另一个保留的分支）
+					 * 1、含有流转角色
+					 * 	1)、条件节点含有下一流转节点（条件/角色）
+					 * 	2)、没有下一流转节点
+					 * 2、没有流转角色
+					 * 	1)、条件节点含有下一流转节点
+					 * 	2)、没有下一流转节点
+					 */
+					if (actorNode) {
+						if (nextNode) {
+							var innerNode = getTreeNode(actorNode)
+							_remove(_maps, _get(nextNode, 'prevId'))
+							_set(nextNode, 'prevId', _get(innerNode, 'nodeId'))
+							_set(innerNode, 'childNode', nextNode)
+
+							_remove(_maps, _get(actorNode, 'prevId'))
+							_set(actorNode, 'prevId', _get(_parent, 'nodeId'))
+							_set(_parent, 'childNode', actorNode)
+						} else {
+							_remove(_maps, _get(actorNode, 'prevId'))
+							_set(actorNode, 'prevId', _get(_parent, 'nodeId'))
+							_set(_parent, 'childNode', actorNode)
+						}
+					} else {
+						if (nextNode) {
+							_remove(_maps, _get(nextNode, 'prevId'))
+							_set(nextNode, 'prevId', _get(_parent, 'nodeId'))
+							_set(_parent, 'childNode', nextNode)
+						} else {
+							_remove(_maps, _get(_get(_parent, 'childNode'), 'prevId'))
+							_remove(_parent, 'childNode')
+						}
+					}
 				}
 			})
 			.on('click', classes.movePrev, function(e) {
 				e.stopPropagation()
 				var $col = el.closest(classes.col)
 				$col.insertBefore($col.prev())
+				
+				var _parent = getParent(node.parent)
+				var _inner = _get(_parent, 'childNode')
+				var _datas = _get(_inner, 'conditionNodes')
+				var index = _datas.indexOf(_data)
+				if (index > 0) {
+		          swap(_datas, index, index - 1);
+		        }
 			})
 			.on('click', classes.moveNext, function(e) {
 				e.stopPropagation()
 				var $col = el.closest(classes.col)
 				$col.insertAfter($col.next())
+
+				var _parent = getParent(node.parent)
+				var _inner = _get(_parent, 'childNode')
+				var _datas = _get(_inner, 'conditionNodes')
+				var index = _datas.indexOf(_data)
+				if (index < _datas.length - 1) {
+					swap(_datas, index, index + 1);
+				}
 			})
 			.on('click', function(e) {
 				if (options.handler) {
-					options.handler.call(options, $node, e)
+					options.handler.call(options, newNode, e)
 				}
 			})
-			return $node
+			return newNode
 		}
 		/**
 		 * 分支容器
-		 */
-		function addLayout(el) {
-			var $container = addContainer(el)
-			var $panel = $container.find(classes.panel)
+		 */	
+		function addLayout(node, options, isNew) {
+			var _node = addContainer(node, isNew)
+			var el = _node.el;
+			var _data = _node.data;
+			var $panel = el.find(classes.panel)
 			var $btn = $(getTemplate(templates.colAdd)).prependTo($panel)
 			var $row = addRow($btn)
+			
+			if (isNew) {
+				_set(_data, {
+					type: 'route',
+					properties: {},
+					conditionNodes: []
+				})
+			}
+
+			var newNode = {
+				el: $row,
+				container: el,
+				data: _get(_data, 'conditionNodes')
+			}
 
 			$btn.on('click', function() {
-				addNode(addContainer(addCol($row), 'prependTo'))
+				addNode(addContainer(addCol(newNode, true), true, 'prependTo'), options, true)
 			})
-			return $row
+			return newNode
 		}
 		function addRow(el) {
 			return $(getTemplate(templates.row)).insertAfter(el)
 		}
-		function addCol(el) {
-			return $(getTemplate(templates.col)).appendTo(el)
+
+		/**
+		 * 添加分支
+		 */
+		function addCol(node, isNew) {
+			var el = node.el
+			var _data = node.data;
+			
+			var data
+
+			/**
+			 * 新增列
+			 * 1、手工录入：
+			 * 2、数据装载：
+			 *
+			 * 内部填充条件节点，增加容器（addContainer），
+			 * 用于区分子节点（childNode）控制，
+			 * 判断后即删除（内部属性）
+			 */
+			if (isNew === true) {
+				data = {
+					$$type: 'condition'
+				}
+				_data.push(data)
+				// data = _data[_data.length - 1]
+			} else {
+				data = isNew
+				_set(data, {
+					$$type: 'condition'
+				})
+			}
+
+			return {
+				el: $(getTemplate(templates.col)).appendTo(el),
+				data: data
+			}
 		}
 		
-		function bindMenuEvents(parent) {
-			var el = parent.find(classes.nodeAdd).get(0);
+		function bindMenuEvents(node) {
+			var el = node.el;
 			$.ux.tips({
-				el: el,
+				el: el.find(classes.nodeAdd).get(0),
 				content: getTemplate(templates.menu, {
-					menus: defaults.menus
+					menus: config.menus
 				}),
 				onMount: function(instance) {
 					var popper = instance.popper;
 
 					$(popper).on('click.popper', classes.menu, function(e) {
 						var index = $(this).index()
-						var menu = (defaults.menus || [])[index];
+						var menu = (config.menus || [])[index];
 						if (menu) {
 							var type = menu.type;
 							switch (type) {
-								case 'actor':
-									var actor = addActor(addContainer(parent), menu)
-									if (menu.handler) {
-										menu.handler.call(menu, actor, e)
-									}
+								case 'condition':
+									var _node = addLayout(node, menu, true)
+									addNode(addContainer(addCol(_node, true), true, 'prependTo'), menu, true)
+									addNode(addContainer(addCol(_node, true), true, 'prependTo'), menu, true)
 									break
-								case 'node':
+								// case 'actor':
 								default:
-									var $row = addLayout(parent)
-									addNode(addContainer(addCol($row), 'prependTo'), menu)
-									addNode(addContainer(addCol($row), 'prependTo'), menu)
+									var _node = addActor(addContainer(node, true), menu, true)
+									if (menu.handler) {
+										menu.handler.call(menu, _node, e)
+									}
 							}
 						}
 					})
@@ -748,39 +1068,120 @@
 				}
 			})
 		}
-		function render() {
+
+		function addRoot(isNew) {
 			root = $(classes.root).html(getTemplate(templates.root))
-			var startNode = root.find(classes.startNode)
-			bindMenuEvents(startNode)
+
+			if (isNew) {
+				_set(_data, {
+					type: 'start',
+					properties: {}
+				})
+			}
+			
+			var el = root.find(classes.startNode)
+			
+			_apply(el, _data)
+
+			bindMenuEvents({
+				el: el,
+				data: _data
+			})
+
+			return el
+		}
+
+		var _startNode
+		function render() {
+			if (_isNew()) {
+				_startNode = addRoot(true)
+			} else {
+				_startNode = addRoot()
+				load({
+					el: _startNode,
+					data: _data
+				})
+			}
+		}
+		function getStartNode() {
+			return _startNode
+		}
+
+		function getMenuOptions(type, data) {
+			var options = config.menus.filter(function(menu) {
+					return menu.type === type
+				})[0] || {}
+			return $.extend(true, {}, options, {
+				node: data
+			})
+		}
+		function load(node) {
+			var _data
+			if (_data = _get(node.data, 'childNode')) {
+				var _datas
+				var $container
+				if (_datas = _get(_data, 'conditionNodes')) {
+					var options = getMenuOptions('condition')
+					var _node = addLayout(node, options)
+					$container = _node.container
+
+					_datas.forEach(function(data, index) {
+						var prevNode = addContainer(addCol(_node, data), false, 'prependTo')
+						addNode(prevNode, options)
+
+						if (_get(data, 'childNode')) {
+							load({
+								el: prevNode.el,
+								data: data
+							})
+						}
+					})
+				} else {
+					var options = getMenuOptions(_data.type, _data)
+					var _node = addContainer(node)
+					$container = _node.el
+					addActor(_node, options)
+				}
+
+				if (_get(_data, 'childNode')) {
+					load({
+						el: $container,
+						data: _data
+					})
+				}
+			}
+		}
+		function _ready(callback) {
+			if ($.isReady) {
+				callback()
+			} else {
+				$(document).ready(callback)
+			}
 		}
 		function init() {
-			if ($.isReady) {
-				render()
-			} else {
-				$(document).ready(render)
-			}
+			_ready(render)
 		}
 		init()
 		initEvents()
 		
 		// 对外 api
 		return {
-			/**
-			 * 添加节点块
-			 */
-			addContainer: addContainer,
-			/**
-			 * 添加节点
-			 */
-			addActor: addActor,
-			/**
-			 * 分支容器
-			 */
-			addLayout: addLayout,
-			/**
-			 * 添加分支
-			 */
-			addCol: addCol
+			getJson: function() {
+				return JSON.stringify(_data)
+			},
+			set: _set,
+			get: _get,
+			load: function(data) {
+				_ready(function() {
+					var el = getStartNode()
+					_data = $.extend({}, _data, data)
+					_maps[_get(_data, 'nodeId')] = _data
+					load({
+						el: el,
+						data: _data
+					})
+				})
+			}
 		}
 	}
 

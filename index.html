@@ -8,18 +8,15 @@
 	<title>工作流系统</title>
 	<link rel="stylesheet" href="styles/css/vendor.css" />
 	<link rel="stylesheet" href="styles/css/app.css" />
-	<script src="build/vendor.js"></script>
-	<script src="build/app.js"></script>
-	<!-- <script src="js/json2.js"></script>
+	<!-- <script src="build/vendor.js"></script>
+	<script src="build/app.js"></script> -->
+	<script src="js/json2.js"></script>
 	<script src="js/template.js"></script>
 	<script src="js/jquery.js"></script>
 	<script src="vendor/popper.js/packages/popper/dist/umd/popper.js"></script>
 	<script src="vendor/tippyjs/umd/index.all.js"></script>
 	<script src="vendor/AlertifyJS/build/alertify.js"></script>
-	<script src="js/global.js"></script> -->
-	<script>
-		var workflow = new Workflow()
-	</script>
+	<script src="js/global.js"></script>
 </head>
 <body>
 <div class="fc-wrap">
@@ -34,7 +31,7 @@
 			<div class="fc-nav-item">流程设计</div>
 		</div>
 		<div class="fc-nav-right">
-			<button type="button" class="fc-button fc-button-save">保存</button>
+			<button type="button" onclick="console.log(workflow.getJson())" class="fc-button fc-button-save">保存</button>
 			<button type="button" class="fc-button fc-button-back">返回</button>
 		</div>
 	</div>
@@ -229,7 +226,7 @@
 	<div class="fc-menu">
 		{{each menus as menu}}
 		<div class="fc-menu-item">
-			<div class="item-icon{{if menu.iconColor}} color-{{menu.iconColor}}{{/if}}"><i class="fa fa-{{menu.icon}}"></i></div>
+			<div class="item-icon{{if menu.color}} color-{{menu.color}}{{/if}}"><i class="fa fa-{{menu.icon}}"></i></div>
 			<div class="item-text">{{menu.text}}</div>
 		</div>
 		{{/each}}
@@ -298,9 +295,11 @@
 		<div class="fc-node-label">
 			<div class="fc-node-header">
 				<div class="fc-node-title">{{title}}</div>
+				{{if tips}}
 				<div class="fc-node-toolbar">
-					<button type="button" class="fc-btn">审批</button>
+					<button type="button" class="fc-btn">{{if icon}}<i class="fa fa-{{icon}}"></i>{{/if}}{{tips}}</button>
 				</div>
+				{{/if}}
 			</div>
 			<div class="fc-node-body">
 				<div class="fc-node-text">{{text}}</div>
@@ -326,6 +325,21 @@
 	</div>
 </script>
 
+<!-- 弹窗：审批 -->
+<script id="tpl-approver" type="text/html">
+	<form name="form" novalidate="novalidate">
+		<div class="x-form">
+			<dl>
+				<dt><span class="star">*</span>条件名称</dt>
+				<dd><input type="text" name="" id="" /></dd>
+			</dl>
+			<dl>
+				<dd><label class="x-group"><input type="radio" name="" />配置条件</label><label class="x-group"><input type="radio" name="" />不满足其他分支条件时，进入该分支</label></dd>
+			</dl>
+		</div>
+	</form>
+</script>
+
 <script>
 	// $.ux.dialog({
 	// 	title: '弹窗组件',
@@ -338,6 +352,115 @@
 	// $.ux.alert('这是一条警告')
 	// $.ux.confirm('确定要执行此操作吗？')
 	// $.ux.notify('操作成功！', 'success')
+</script>
+<script>
+	var workflow = new Workflow({
+		menus: [{
+				type: 'approver', // 节点类型：node-条件节点
+				icon: 'user-o', // 图标，参考 fontasome
+				color: 'orange', // 图标颜色定制，默认蓝色
+				text: '审批节点',
+				node: { // 可预定义配置
+					tips: '审批',
+					icon: 'edit',
+					title: '直接主管审批',
+					text: '请设置审批人'
+				},
+				handler: function(node, event) {
+					var el = node.el;
+					var data = node.data;
+					$.ux.drawer({
+						title: '选择审批人',
+						message: template('tpl-approver', node.data),
+						onok: function() {
+
+						}
+					}).set('width', 640)
+				}
+			}, {
+				type: 'notifier',
+				icon: 'send',
+				text: '处理节点',
+				color: 'green',
+				node: {
+					tips: '支付',
+					icon: 'credit-card',
+					color: 'green', // 定义不同色块(blue/green/orange)，也支持色值(#b99a01)
+					title: '出纳支付'
+				}
+			}, {
+				type: 'condition',
+				icon: 'sitemap',
+				text: '条件分支'
+			}],
+		// data: {
+		// 	"type": "start",
+		// 	"properties": {},
+		// 	"childNode": {
+		// 		"type": "route",
+		// 		"properties": {},
+		// 		"conditionNodes": [{
+		// 			"type": "condition",
+		// 			"name": "未命名条件",
+		// 			"properties": {}
+		// 		}, {
+		// 			"type": "condition",
+		// 			"name": "未命名条件",
+		// 			"properties": {}
+		// 		}]
+		// 	}
+		// }
+	})
+	
+	// 单独载入数据方式
+	workflow.load({
+		"type": "start",
+		"properties": {},
+		"nodeId": "0001",
+		"childNode": {
+			"childNode": {
+				"childNode": {
+					"childNode": {
+						"nodeId": "0002",
+						"prevId": "0005",
+						"type": "notifier",
+						"properties": {}
+					},
+					"nodeId": "0005",
+					"prevId": "0004",
+					"type": "route",
+					"properties": {},
+					"conditionNodes": [{
+						"nodeId": "0006",
+						"prevId": "0005",
+						"name": "未命名条件",
+						"type": "condition",
+						"properties": {},
+						"childNode": {
+							"nodeId": "0008",
+							"prevId": "0006",
+							"type": "approver",
+							"properties": {}
+						}
+					}, {
+						"nodeId": "0007",
+						"prevId": "0005",
+						"name": "未命名条件",
+						"type": "condition",
+						"properties": {}
+					}]
+				},
+				"nodeId": "0004",
+				"prevId": "0003",
+				"type": "notifier",
+				"properties": {}
+			},
+			"nodeId": "0003",
+			"prevId": "0001",
+			"type": "approver",
+			"properties": {}
+		}
+	})
 </script>
 </body>
 </html>
