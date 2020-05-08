@@ -434,30 +434,68 @@
 ;(function($) {
 	$.ux = $.ux || {}
 
-	var uid = ['0', '0', '0', '0'];
+	// var uid = ['0', '0', '0', '0'];
 
-	function uuid(prefix) {
-		var index = uid.length;
-		var digit;
-		prefix = prefix || ''
+	// function uuid(prefix) {
+	// 	var index = uid.length;
+	// 	var digit;
+	// 	prefix = prefix || ''
 
-		while (index) {
-			index--;
-			digit = uid[index].charCodeAt(0);
-			if (digit === 57 /*'9'*/ ) {
-				uid[index] = 'A';
-				return prefix + uid.join('');
-			}
-			if (digit === 90 /*'Z'*/ ) {
-				uid[index] = '0';
-			} else {
-				uid[index] = String.fromCharCode(digit + 1);
-				return prefix + uid.join('');
+	// 	while (index) {
+	// 		index--;
+	// 		digit = uid[index].charCodeAt(0);
+	// 		if (digit === 57 /*'9'*/ ) {
+	// 			uid[index] = 'A';
+	// 			return prefix + uid.join('');
+	// 		}
+	// 		if (digit === 90 /*'Z'*/ ) {
+	// 			uid[index] = '0';
+	// 		} else {
+	// 			uid[index] = String.fromCharCode(digit + 1);
+	// 			return prefix + uid.join('');
+	// 		}
+	// 	}
+	// 	uid.unshift('0');
+
+	// 	return prefix + uid.join('');
+	// }
+	
+	function uuid(len, radix) {
+		var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split('');
+		var uuid = [],
+			i;
+		radix = radix || chars.length;
+
+		if (len) {
+			// Compact form
+			for (i = 0; i < len; i++) uuid[i] = chars[0 | Math.random() * radix];
+		} else {
+			// rfc4122, version 4 form
+			var r;
+
+			// rfc4122 requires these characters
+			uuid[8] = uuid[13] = uuid[18] = uuid[23] = '-';
+			uuid[14] = '4';
+
+			// Fill in random data.  At i==19 set the high bits of clock sequence as
+			// per rfc4122, sec. 4.1.5
+			for (i = 0; i < 36; i++) {
+				if (!uuid[i]) {
+					r = 0 | Math.random() * 16;
+					uuid[i] = chars[(i == 19) ? (r & 0x3) | 0x8 : r];
+				}
 			}
 		}
-		uid.unshift('0');
 
-		return prefix + uid.join('');
+		return uuid.join('');
+	}
+
+	function guid() {
+		return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+			var r = Math.random() * 16 | 0,
+				v = c == 'x' ? r : (r & 0x3 | 0x8);
+			return v.toString(16);
+		});
 	}
 
 	function _model(type, icon) {
@@ -501,7 +539,10 @@
 	}
 
 	$.extend($.ux, {
-		id: uuid,
+		// id: uuid,
+		id: function() {
+			return uuid(7)
+		},
 		tips: function(el, options) {
 			if (arguments.length === 1) {
 				options = el
@@ -611,6 +652,7 @@
 						_set(data, k, key[k])
 					}
 				}
+				return
 			}
 			data[params[key] || key] = value
 		}
