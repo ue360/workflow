@@ -694,7 +694,8 @@
 		}
 		function _getId(el) {
 			// var m = el.get(0).className.match(/\sfc-node-([0-9a-zA-Z]{0,4})\s*/)
-			var m = $(el).get(0).className.match(new RegExp("\\s" + _idProfix + "([0-9a-zA-Z]{0,4})\\s*"))
+			// var m = $(el).get(0).className.match(new RegExp("\\s" + _idProfix + "([0-9a-zA-Z]{0,4})\\s*"))
+			var m = $(el).get(0).className.match(new RegExp("\\s" + _idProfix + "([0-9a-zA-Z]+)\\s*"))
 			if (m) {
 				return m[1]
 			}
